@@ -1,0 +1,164 @@
+use roc_std::{RocBox, RocStr};
+use std::{
+    ffi::c_void,
+    mem::{self, ManuallyDrop},
+};
+
+pub mod glue;
+pub mod runtime;
+
+pub type Model = RocBox<c_void>;
+pub type Message = RocBox<c_void>;
+
+#[no_mangle]
+pub extern "C" fn rust_main() -> i32 {
+    let program = program();
+
+    match runtime::run(program) {
+        Ok(_) => 0,
+        Err(err) => {
+            eprintln!("ERROR: {err}");
+            1
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Program {
+    model: ManuallyDrop<Model>,
+}
+
+pub fn program() -> Program {
+    extern "C" {
+        fn roc__mainForHost_1_exposed() -> Model;
+    }
+
+    let model = unsafe { roc__mainForHost_1_exposed() };
+
+    Program {
+        model: ManuallyDrop::new(model),
+    }
+}
+
+impl Program {
+    pub fn update(&mut self, message: Message) {
+        extern "C" {
+            fn roc__mainForHost_0_caller(
+                model: *const Model,
+                message: *const Message,
+                closure_data: *mut u8,
+                output: *mut Model,
+            );
+        }
+
+        let mut output = core::mem::MaybeUninit::uninit();
+
+        unsafe {
+            roc__mainForHost_0_caller(
+                &*self.model,
+                &message,
+                vec![].as_mut_ptr(),
+                output.as_mut_ptr(),
+            );
+
+            // Decremented by Roc
+            mem::forget(message);
+
+            self.model = ManuallyDrop::new(output.assume_init());
+        }
+    }
+
+    pub fn view(&self) -> glue::Element {
+        extern "C" {
+            fn roc__mainForHost_1_caller(
+                model: *const Model,
+                closure_data: *mut u8,
+                output: *mut glue::Element,
+            );
+        }
+
+        let mut output = core::mem::MaybeUninit::uninit();
+
+        // Inc by 1 since Roc will dec by 1
+        let model = self.model.clone();
+
+        unsafe {
+            roc__mainForHost_1_caller(&*model, vec![].as_mut_ptr(), output.as_mut_ptr());
+
+            return output.assume_init();
+        }
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn roc_alloc(size: usize, _alignment: u32) -> *mut c_void {
+    return libc::malloc(size);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn roc_realloc(
+    c_ptr: *mut c_void,
+    new_size: usize,
+    _old_size: usize,
+    _alignment: u32,
+) -> *mut c_void {
+    return libc::realloc(c_ptr, new_size);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn roc_dealloc(c_ptr: *mut c_void, _alignment: u32) {
+    return libc::free(c_ptr);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn roc_panic(msg: *mut RocStr, tag_id: u32) {
+    match tag_id {
+        0 => {
+            eprintln!("Roc standard library hit a panic: {}", &*msg);
+        }
+        1 => {
+            eprintln!("Application hit a panic: {}", &*msg);
+        }
+        _ => unreachable!(),
+    }
+    std::process::exit(1);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn roc_dbg(loc: *mut RocStr, msg: *mut RocStr, src: *mut RocStr) {
+    eprintln!("[{}] {} = {}", &*loc, &*src, &*msg);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn roc_memset(dst: *mut c_void, c: i32, n: usize) -> *mut c_void {
+    libc::memset(dst, c, n)
+}
+
+#[cfg(unix)]
+#[no_mangle]
+pub unsafe extern "C" fn roc_getppid() -> libc::pid_t {
+    libc::getppid()
+}
+
+#[cfg(unix)]
+#[no_mangle]
+pub unsafe extern "C" fn roc_mmap(
+    addr: *mut libc::c_void,
+    len: libc::size_t,
+    prot: libc::c_int,
+    flags: libc::c_int,
+    fd: libc::c_int,
+    offset: libc::off_t,
+) -> *mut libc::c_void {
+    libc::mmap(addr, len, prot, flags, fd, offset)
+}
+
+#[cfg(unix)]
+#[no_mangle]
+pub unsafe extern "C" fn roc_shm_open(
+    name: *const libc::c_char,
+    oflag: libc::c_int,
+    mode: libc::mode_t,
+) -> libc::c_int {
+    libc::shm_open(name, oflag, mode as libc::c_uint)
+}

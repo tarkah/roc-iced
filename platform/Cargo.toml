@@ -1,0 +1,18 @@
+[package]
+name = "host"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "host"
+path = "src/lib.rs"
+crate-type = ["staticlib", "lib"]
+
+[[bin]]
+name = "host"
+path = "src/main.rs"
+
+[dependencies]
+libc = "0.2"
+roc_std = { git = "https://github.com/roc-lang/roc", rev = "794c20956de5f22019fe1bf1cad6bf7b738add52" }
+iced = { git = "https://github.com/iced-rs/iced", rev = "2b19471d1cfe4cf034b026aa6620b1685a5ab772" }

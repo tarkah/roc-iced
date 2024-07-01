@@ -1,0 +1,12 @@
+platform/target/
+platform/glue/
+platform/app*
+!platform/app.roc
+platform/libapp.*
+platform/dynhost
+platform/linux-x64.rh
+platform/metadata_linux-x64.rm
+platform/*.tar*
+
+examples/*
+!examples/*.roc
