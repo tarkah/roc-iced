@@ -6,7 +6,7 @@ on:
   # Run on a push to the main branch
   push:
     branches:
-      - main
+      - master
   # Run when a release is published
   release:
     types:
