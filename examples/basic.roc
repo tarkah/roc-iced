@@ -2,6 +2,7 @@ app [program, Model, Message] {
     iced: platform "../platform/main.roc",
 }
 
+import iced.Color
 import iced.Element exposing [Element]
 import iced.Element.Container as Container
 import iced.Element.Container exposing [container]
@@ -61,9 +62,20 @@ view = \model ->
             onSubmit: Active Submitted,
         },
     ]
-    |> body
+    |> boxed
+    |> centered
 
-body = \elem ->
+centered = \elem ->
     elem
     |> container
     |> Container.center Fill
+
+boxed = \elem ->
+    background = Some (Color.fromHex 0xcad4e0ff)
+    border = { width: 1, color: Color.black, radius: 3 }
+    style = { border, background }
+
+    elem
+    |> container
+    |> Container.padding 8
+    |> Container.style style

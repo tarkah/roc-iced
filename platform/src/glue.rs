@@ -132,9 +132,19 @@ impl Length {
 pub struct Container {
     pub content: Element,
     pub height: Length,
+    pub padding: Padding,
+    pub style: ContainerStyle,
     pub width: Length,
     pub center_x: bool,
     pub center_y: bool,
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct ContainerStyle {
+    pub background: Optional<Color>,
+    pub border: Border,
+    pub text_color: Optional<Color>,
 }
 
 #[derive(Debug)]
@@ -378,4 +388,84 @@ impl<T> Drop for Action<T> {
             }
         }
     }
+}
+
+#[derive(Clone, Copy, Default, Debug, PartialEq, PartialOrd)]
+#[repr(C)]
+pub struct Color {
+    pub a: f32,
+    pub b: f32,
+    pub g: f32,
+    pub r: f32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
+#[repr(u8)]
+pub enum OptionalTag {
+    None = 0,
+    Some = 1,
+}
+
+#[repr(C)]
+pub union OptionalPayload<T> {
+    none: (),
+    some: ManuallyDrop<T>,
+}
+
+#[repr(C)]
+pub struct Optional<T> {
+    pub payload: OptionalPayload<T>,
+    pub tag: OptionalTag,
+}
+
+impl<T: fmt::Debug> fmt::Debug for Optional<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        use OptionalTag::*;
+
+        unsafe {
+            match self.tag {
+                None => "None".fmt(f),
+                Some => f.debug_tuple("Some").field(&self.payload.some).finish(),
+            }
+        }
+    }
+}
+
+impl<T> Drop for Optional<T> {
+    fn drop(&mut self) {
+        use OptionalTag::*;
+
+        unsafe {
+            match self.tag {
+                None => {}
+                Some => ManuallyDrop::drop(&mut self.payload.some),
+            }
+        }
+    }
+}
+
+impl<T> Optional<T> {
+    pub fn as_option(&self) -> Option<&T> {
+        match self.tag {
+            OptionalTag::None => None,
+            OptionalTag::Some => unsafe { Some(&*self.payload.some) },
+        }
+    }
+}
+
+#[derive(Clone, Copy, Default, Debug, PartialEq, PartialOrd)]
+#[repr(C)]
+pub struct Border {
+    pub color: Color,
+    pub radius: f32,
+    pub width: f32,
+}
+
+#[derive(Clone, Copy, Default, Debug, PartialEq, PartialOrd)]
+#[repr(C)]
+pub struct Padding {
+    pub bottom: f32,
+    pub left: f32,
+    pub right: f32,
+    pub top: f32,
 }

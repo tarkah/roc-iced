@@ -10,3 +10,5 @@ platform/*.tar*
 
 examples/*
 !examples/*.roc
+
+glue/types.txt

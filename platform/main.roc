@@ -1,6 +1,6 @@
 platform "iced"
     requires { Model, Message } { program : _ }
-    exposes [Action, Length, Element]
+    exposes [Action, Border, Color, Element, Length, Option, Padding]
     packages {}
     imports [Element.{ Element }, Box.{ unbox, box }]
     provides [mainForHost]

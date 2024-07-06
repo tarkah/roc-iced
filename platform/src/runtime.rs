@@ -69,7 +69,17 @@ mod convert {
             glue::ElementTag::Container => {
                 let inner = roc_elem.container();
 
-                let mut container = container(element(&inner.content));
+                let style = container::Style {
+                    text_color: color_opt(&inner.style.text_color),
+                    background: color_opt(&inner.style.background).map(Into::into),
+                    border: border(inner.style.border),
+                    // TODO
+                    shadow: Default::default(),
+                };
+
+                let mut container = container(element(&inner.content))
+                    .padding(padding(inner.padding))
+                    .style(move |_| style);
 
                 if let Some(width) = length(inner.width) {
                     if inner.center_x {
@@ -130,5 +140,39 @@ mod convert {
             glue::LengthTag::Shrink => iced::Length::Shrink,
             glue::LengthTag::Unspecified => return None,
         })
+    }
+
+    fn color_opt(c: &glue::Optional<glue::Color>) -> Option<iced::Color> {
+        c.as_option().copied().map(color)
+    }
+
+    fn color(color: glue::Color) -> iced::Color {
+        let glue::Color { r, g, b, a } = color;
+
+        iced::Color { r, g, b, a }
+    }
+
+    fn border(b: glue::Border) -> iced::Border {
+        iced::Border {
+            color: color(b.color),
+            width: b.width,
+            radius: b.radius.into(),
+        }
+    }
+
+    fn padding(p: glue::Padding) -> iced::Padding {
+        let glue::Padding {
+            bottom,
+            left,
+            right,
+            top,
+        } = p;
+
+        iced::Padding {
+            top,
+            right,
+            bottom,
+            left,
+        }
     }
 }

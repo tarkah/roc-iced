@@ -6,6 +6,10 @@ build:
 bundle:
 	roc build --bundle .tar.br platform/main.roc
 
+.PHONY: types
+types:
+	roc glue glue/alignment.roc glue/ platform/main-glue.roc
+
 .PHONY: clean
 clean:
 	find examples/ -type f ! -name '*.roc' -delete

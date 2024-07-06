@@ -30,8 +30,8 @@ map = \elem, mapper ->
         Column children ->
             Column (List.map children elemMapper)
 
-        Container { content, width, height, centerX, centerY } ->
-            Container { content: elemMapper content, width, height, centerX, centerY }
+        Container { content, width, height, centerX, centerY, padding, style } ->
+            Container { content: elemMapper content, width, height, centerX, centerY, padding, style }
 
         Button { content, onPress } ->
             Button { content: elemMapper content, onPress: Action.map onPress \a -> mapper a }
