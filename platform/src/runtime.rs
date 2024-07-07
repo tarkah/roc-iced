@@ -1,11 +1,16 @@
 use iced::Element;
 
-use crate::Program;
+use crate::{glue, Program};
 
-pub fn run(program: Program) -> iced::Result {
-    iced::application("Roc + Iced <3", App::update, App::view).run_with(move || App {
-        program: program.clone(),
-    })
+pub fn run(program: Program, settings: glue::Settings) -> iced::Result {
+    let (settings, window_settings) = convert::settings(settings);
+
+    iced::application("Roc + Iced <3", App::update, App::view)
+        .settings(settings)
+        .window(window_settings)
+        .run_with(move || App {
+            program: program.clone(),
+        })
 }
 
 #[derive(Debug, Clone)]
@@ -174,5 +179,44 @@ mod convert {
             bottom,
             left,
         }
+    }
+
+    pub fn settings(s: glue::Settings) -> (iced::Settings, iced::window::Settings) {
+        let glue::Settings {
+            window,
+            antialiasing,
+            default_text_size,
+        } = s;
+
+        let settings = iced::Settings {
+            antialiasing,
+            default_text_size: default_text_size.into(),
+            ..Default::default()
+        };
+
+        let glue::WindowSettings {
+            max_size,
+            min_size,
+            size,
+            decorations,
+            resizable,
+            transparent,
+        } = window;
+
+        let window_settings = iced::window::Settings {
+            size: iced::Size::new(size.width, size.height),
+            min_size: min_size
+                .as_option()
+                .map(|size| iced::Size::new(size.width, size.height)),
+            max_size: max_size
+                .as_option()
+                .map(|size| iced::Size::new(size.width, size.height)),
+            decorations,
+            resizable,
+            transparent,
+            ..Default::default()
+        };
+
+        (settings, window_settings)
     }
 }

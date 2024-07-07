@@ -12,9 +12,9 @@ pub type Message = RocBox<c_void>;
 
 #[no_mangle]
 pub extern "C" fn rust_main() -> i32 {
-    let program = program();
+    let (program, settings) = program();
 
-    match runtime::run(program) {
+    match runtime::run(program, settings) {
         Ok(_) => 0,
         Err(err) => {
             eprintln!("ERROR: {err}");
@@ -28,16 +28,19 @@ pub struct Program {
     model: ManuallyDrop<Model>,
 }
 
-pub fn program() -> Program {
+pub fn program() -> (Program, glue::Settings) {
     extern "C" {
-        fn roc__mainForHost_1_exposed() -> Model;
+        fn roc__mainForHost_1_exposed() -> glue::Init;
     }
 
-    let model = unsafe { roc__mainForHost_1_exposed() };
+    let glue::Init { model, settings } = unsafe { roc__mainForHost_1_exposed() };
 
-    Program {
-        model: ManuallyDrop::new(model),
-    }
+    (
+        Program {
+            model: ManuallyDrop::new(model),
+        },
+        settings,
+    )
 }
 
 impl Program {

@@ -2,11 +2,14 @@ app [program, Model, Message] {
     iced: platform "../platform/main.roc",
 }
 
+import Box exposing [box]
+
 import iced.Color
-import iced.Element exposing [Element]
 import iced.Element.Container as Container
 import iced.Element.Container exposing [container]
-import Box exposing [box]
+import iced.Element exposing [Element]
+import iced.Option exposing [Option]
+import iced.Settings exposing [Settings]
 
 program = { init, update, view }
 
@@ -20,8 +23,12 @@ Message : [
     Submitted,
 ]
 
-init : Model
-init = { count: 0, isFooChecked: Bool.false, isBarChecked: Bool.true, input: "" }
+init : { model : Model, settings : Option Settings }
+init =
+    model = { count: 0, isFooChecked: Bool.false, isBarChecked: Bool.true, input: "" }
+    settings = Settings.default |> Settings.size { width: 300, height: 300 } |> Some
+
+    { model, settings }
 
 update : Model, Message -> Model
 update = \model, message ->

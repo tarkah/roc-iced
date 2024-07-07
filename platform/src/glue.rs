@@ -171,12 +171,11 @@ impl TextInputOnInput {
 
         let mut output = core::mem::MaybeUninit::uninit();
 
+        // Roc will decrement
+        let arg = ManuallyDrop::new(RocStr::from(arg0));
+
         unsafe {
-            roc__mainForHost_2_caller(
-                &RocStr::from(arg0),
-                &*self.closure_data,
-                output.as_mut_ptr(),
-            );
+            roc__mainForHost_2_caller(&*arg, &*self.closure_data, output.as_mut_ptr());
 
             output.assume_init()
         }
@@ -468,4 +467,37 @@ pub struct Padding {
     pub left: f32,
     pub right: f32,
     pub top: f32,
+}
+
+#[derive(Clone, Copy, Default, Debug, PartialEq, PartialOrd)]
+#[repr(C)]
+pub struct Size {
+    pub height: f32,
+    pub width: f32,
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct Settings {
+    pub default_text_size: f32,
+    pub window: WindowSettings,
+    pub antialiasing: bool,
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct WindowSettings {
+    pub max_size: Optional<Size>,
+    pub min_size: Optional<Size>,
+    pub size: Size,
+    pub decorations: bool,
+    pub resizable: bool,
+    pub transparent: bool,
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct Init {
+    pub model: RocBox<c_void>,
+    pub settings: Settings,
 }

@@ -6,7 +6,7 @@ Model : {}
 Message : {}
 
 program = {
-    init: {},
+    init: { model: {}, settings: None },
     update: \m, _ -> m,
     view: \_ -> Text "Hello World!",
 }

@@ -2,7 +2,7 @@ platform "glue-workaround"
     requires {} { notUsed : _ }
     exposes []
     packages {}
-    imports [Action.{ Action }, Length.{ Length }, Padding.{ Padding }, Element.Container]
+    imports [Action.{ Action }, Length.{ Length }, Padding.{ Padding }, Element.Container, Settings.{ Settings }]
     provides [mainForHost]
 
 Element message : [
@@ -21,6 +21,7 @@ GlueStuff : {
     a : Element {},
     b : Length,
     c : Action {},
+    d : Settings,
 }
 
 mainForHost : GlueStuff
