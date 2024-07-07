@@ -2,8 +2,6 @@ app [program, Model, Message] {
     iced: platform "../platform/main.roc",
 }
 
-import Box exposing [box]
-
 import iced.Color
 import iced.Element.Container as Container
 import iced.Element.Container exposing [container]
@@ -48,12 +46,12 @@ view = \model ->
         Checkbox {
             label: "Foo",
             isChecked: model.isFooChecked,
-            onToggle: Active (box FooToggled),
+            onToggle: Active FooToggled,
         },
         Checkbox {
             label: "Bar",
             isChecked: model.isBarChecked,
-            onToggle: Active (box BarToggled),
+            onToggle: Active BarToggled,
         },
         Checkbox {
             label: "Baz",
@@ -63,7 +61,7 @@ view = \model ->
         TextInput {
             value: model.input,
             width: Fixed 150,
-            onInput: Active (box Input),
+            onInput: Active Input,
             onSubmit: Active Submitted,
         },
     ]

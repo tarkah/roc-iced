@@ -1,6 +1,5 @@
 module [Element, map]
 
-import Box exposing [box, unbox]
 import Action exposing [Action]
 import Length exposing [Length]
 import Element.Container as Container
@@ -12,8 +11,8 @@ Element message : [
     Column (List (Element message)),
     Container (Container (Element message)),
     Button { content : Element message, onPress : Action message },
-    Checkbox { label : Str, isChecked : Bool, onToggle : Action (Box (Bool -> message)) },
-    TextInput { value : Str, width : Length, onInput : Action (Box (Str -> message)), onSubmit : Action message },
+    Checkbox { label : Str, isChecked : Bool, onToggle : Action (Bool -> message) },
+    TextInput { value : Str, width : Length, onInput : Action (Str -> message), onSubmit : Action message },
 ]
 
 map : Element a, (a -> b) -> Element b
@@ -40,13 +39,13 @@ map = \elem, mapper ->
             Checkbox {
                 label,
                 isChecked,
-                onToggle: Action.map onToggle \a -> box (\b -> mapper ((unbox a) b)),
+                onToggle: Action.map onToggle \a -> \b -> mapper (a b),
             }
 
         TextInput { value, width, onInput, onSubmit } ->
             TextInput {
                 value,
                 width,
-                onInput: Action.map onInput \a -> box (\b -> mapper ((unbox a) b)),
+                onInput: Action.map onInput \a -> \b -> mapper (a b),
                 onSubmit: Action.map onSubmit \a -> mapper a,
             }
