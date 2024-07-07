@@ -8,7 +8,6 @@ import iced.Color
 import iced.Element.Container as Container
 import iced.Element.Container exposing [container]
 import iced.Element exposing [Element]
-import iced.Option exposing [Option]
 import iced.Settings exposing [Settings]
 
 program = { init, update, view }
@@ -23,12 +22,11 @@ Message : [
     Submitted,
 ]
 
-init : { model : Model, settings : Option Settings }
-init =
-    model = { count: 0, isFooChecked: Bool.false, isBarChecked: Bool.true, input: "" }
-    settings = Settings.default |> Settings.size { width: 300, height: 300 } |> Some
-
-    { model, settings }
+init : { model : Model, settings : Settings }
+init = {
+    model: { count: 0, isFooChecked: Bool.false, isBarChecked: Bool.true, input: "" },
+    settings: Settings.default |> Settings.size { width: 300, height: 300 },
+}
 
 update : Model, Message -> Model
 update = \model, message ->

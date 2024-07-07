@@ -11,20 +11,20 @@ platform "iced"
         Settings,
     ]
     packages {}
-    imports [Element.{ Element }, Option.{ Option }, Settings.{ Settings }, Box.{ unbox, box }]
+    imports [Element.{ Element }, Settings.{ Settings }, Box.{ unbox, box }]
     provides [mainForHost]
 
 # We box the model before passing to the Host and unbox when passed to Roc
 ProgramForHost : {
-    init : { model : Box Model, settings : Option Settings },
+    init : { model : Box Model, settings : Settings },
     update : Box Model, Box Message -> Box Model,
     view : Box Model -> Element (Box Message),
 }
 
-init : { model : Box Model, settings : Option Settings }
+init : { model : Box Model, settings : Settings }
 init =
     program.init
-    |> \{ model: m, settings } -> { model: box m, settings }
+    |> \{ model, settings ? Settings.default } -> { model: box model, settings }
 
 update : Box Model, Box Message -> Box Model
 update = \model, message ->
