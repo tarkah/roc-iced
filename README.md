@@ -13,10 +13,11 @@ app [program, Model, Message] {
     iced: platform "../platform/main.roc",
 }
 
-import iced.Element exposing [Element]
+import iced.Color
 import iced.Element.Container as Container
 import iced.Element.Container exposing [container]
-import Box exposing [box]
+import iced.Element exposing [Element]
+import iced.Settings exposing [Settings]
 
 program = { init, update, view }
 
@@ -30,8 +31,11 @@ Message : [
     Submitted,
 ]
 
-init : Model
-init = { count: 0, isFooChecked: Bool.false, isBarChecked: Bool.true, input: "" }
+init : { model : Model, settings : Settings }
+init = {
+    model: { count: 0, isFooChecked: Bool.false, isBarChecked: Bool.true, input: "" },
+    settings: Settings.default |> Settings.size { width: 300, height: 300 },
+}
 
 update : Model, Message -> Model
 update = \model, message ->
@@ -53,12 +57,12 @@ view = \model ->
         Checkbox {
             label: "Foo",
             isChecked: model.isFooChecked,
-            onToggle: Active (box FooToggled),
+            onToggle: Active FooToggled,
         },
         Checkbox {
             label: "Bar",
             isChecked: model.isBarChecked,
-            onToggle: Active (box BarToggled),
+            onToggle: Active BarToggled,
         },
         Checkbox {
             label: "Baz",
@@ -68,14 +72,25 @@ view = \model ->
         TextInput {
             value: model.input,
             width: Fixed 150,
-            onInput: Active (box Input),
+            onInput: Active Input,
             onSubmit: Active Submitted,
         },
     ]
-    |> body
+    |> boxed
+    |> centered
 
-body = \elem ->
+centered = \elem ->
     elem
     |> container
     |> Container.center Fill
+
+boxed = \elem ->
+    background = Some (Color.fromHex 0xcad4e0ff)
+    border = { width: 1, color: Color.black, radius: 3 }
+    style = { border, background }
+
+    elem
+    |> container
+    |> Container.padding 8
+    |> Container.style style
 ```
