@@ -29,8 +29,8 @@ map = \elem, mapper ->
         Column children ->
             Column (List.map children elemMapper)
 
-        Container { content, width, height, centerX, centerY, padding, style } ->
-            Container { content: elemMapper content, width, height, centerX, centerY, padding, style }
+        Container { content, padding, width, height, maxWidth, maxHeight, horizontalAlignment, verticalAlignment, clip, style } ->
+            Container { content: elemMapper content, padding, width, height, maxWidth, maxHeight, horizontalAlignment, verticalAlignment, clip, style }
 
         Button { content, onPress } ->
             Button { content: elemMapper content, onPress: Action.map onPress \a -> mapper a }

@@ -29,7 +29,7 @@ impl App {
     }
 
     fn view<'a>(&'a self) -> Element<'a, Message> {
-        convert::element(&self.program.view())
+        convert::element(&dbg!(self.program.view()))
     }
 }
 
@@ -84,22 +84,19 @@ mod convert {
 
                 let mut container = container(element(&inner.content))
                     .padding(padding(inner.padding))
+                    .max_width(inner.max_width)
+                    .max_height(inner.max_height)
+                    .align_x(horizontal_alignment(inner.horizontal_alignment))
+                    .align_y(vertical_alignment(inner.vertical_alignment))
+                    .clip(inner.clip)
                     .style(move |_| style);
 
-                if let Some(width) = length(inner.width) {
-                    if inner.center_x {
-                        container = container.center_x(width);
-                    } else {
-                        container = container.width(width);
-                    }
+                if let Some(width) = inner.width.as_option().copied().map(length) {
+                    container = container.width(width);
                 }
 
-                if let Some(height) = length(inner.height) {
-                    if inner.center_y {
-                        container = container.center_y(height);
-                    } else {
-                        container = container.height(height);
-                    }
+                if let Some(height) = inner.height.as_option().copied().map(length) {
+                    container = container.height(height);
                 }
 
                 container.into()
@@ -117,11 +114,8 @@ mod convert {
             glue::ElementTag::TextInput => {
                 let inner = roc_elem.text_input();
 
-                let mut text_input = text_input("", inner.value.as_str());
-
-                if let Some(width) = length(inner.width) {
-                    text_input = text_input.width(width);
-                }
+                let mut text_input =
+                    text_input("", inner.value.as_str()).width(length(inner.width));
 
                 if let Some(action) = inner.on_submit.active().cloned() {
                     text_input = text_input.on_submit(Message(action));
@@ -137,14 +131,13 @@ mod convert {
         }
     }
 
-    fn length(roc_length: glue::Length) -> Option<iced::Length> {
-        Some(match roc_length.tag {
+    fn length(roc_length: glue::Length) -> iced::Length {
+        match roc_length.tag {
             glue::LengthTag::Fill => iced::Length::Fill,
             glue::LengthTag::FillPortion => iced::Length::FillPortion(roc_length.fill_portion()),
             glue::LengthTag::Fixed => iced::Length::Fixed(roc_length.fixed()),
             glue::LengthTag::Shrink => iced::Length::Shrink,
-            glue::LengthTag::Unspecified => return None,
-        })
+        }
     }
 
     fn color_opt(c: &glue::Optional<glue::Color>) -> Option<iced::Color> {
@@ -178,6 +171,22 @@ mod convert {
             right,
             bottom,
             left,
+        }
+    }
+
+    fn horizontal_alignment(a: glue::HorizontalAlignment) -> iced::alignment::Horizontal {
+        match a {
+            glue::HorizontalAlignment::Center => iced::alignment::Horizontal::Center,
+            glue::HorizontalAlignment::Left => iced::alignment::Horizontal::Left,
+            glue::HorizontalAlignment::Right => iced::alignment::Horizontal::Right,
+        }
+    }
+
+    fn vertical_alignment(a: glue::VerticalAlignment) -> iced::alignment::Vertical {
+        match a {
+            glue::VerticalAlignment::Bottom => iced::alignment::Vertical::Bottom,
+            glue::VerticalAlignment::Center => iced::alignment::Vertical::Center,
+            glue::VerticalAlignment::Top => iced::alignment::Vertical::Top,
         }
     }
 

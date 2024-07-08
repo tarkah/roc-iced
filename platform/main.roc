@@ -2,6 +2,7 @@ platform "iced"
     requires { Model, Message } { program : _ }
     exposes [
         Action,
+        Alignment,
         Border,
         Color,
         Element,

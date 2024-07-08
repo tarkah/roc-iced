@@ -64,7 +64,6 @@ pub enum LengthTag {
     FillPortion = 1,
     Fixed = 2,
     Shrink = 3,
-    Unspecified = 4,
 }
 
 #[derive(Clone, Copy)]
@@ -74,7 +73,6 @@ pub union LengthPayload {
     fill_portion: u16,
     fixed: f32,
     shrink: (),
-    unspecified: (),
 }
 
 #[derive(Clone, Copy)]
@@ -106,10 +104,6 @@ impl fmt::Debug for Length {
                     .debug_tuple("Length::Shrink")
                     .field(&self.payload.shrink)
                     .finish(),
-                Unspecified => f
-                    .debug_tuple("Length::Unspecified")
-                    .field(&self.payload.unspecified)
-                    .finish(),
             }
         }
     }
@@ -131,12 +125,15 @@ impl Length {
 #[repr(C)]
 pub struct Container {
     pub content: Element,
-    pub height: Length,
+    pub height: Optional<Length>,
+    pub max_height: f32,
+    pub max_width: f32,
     pub padding: Padding,
     pub style: ContainerStyle,
-    pub width: Length,
-    pub center_x: bool,
-    pub center_y: bool,
+    pub width: Optional<Length>,
+    pub clip: bool,
+    pub horizontal_alignment: HorizontalAlignment,
+    pub vertical_alignment: VerticalAlignment,
 }
 
 #[derive(Debug)]
@@ -500,4 +497,20 @@ pub struct WindowSettings {
 pub struct Init {
     pub model: RocBox<c_void>,
     pub settings: Settings,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[repr(u8)]
+pub enum VerticalAlignment {
+    Bottom,
+    Center,
+    Top,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[repr(u8)]
+pub enum HorizontalAlignment {
+    Center,
+    Left,
+    Right,
 }

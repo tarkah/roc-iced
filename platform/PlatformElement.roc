@@ -30,8 +30,8 @@ boxed = \elem ->
             Column children ->
                 Column (List.map children map)
 
-            Container { content, width, height, centerX, centerY, padding, style } ->
-                Container { content: map content, width, height, centerX, centerY, padding, style }
+            Container { content, padding, width, height, maxWidth, maxHeight, horizontalAlignment, verticalAlignment, clip, style } ->
+                Container { content: map content, padding, width, height, maxWidth, maxHeight, horizontalAlignment, verticalAlignment, clip, style }
 
             Button { content, onPress } ->
                 Button { content: map content, onPress }
