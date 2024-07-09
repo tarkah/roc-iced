@@ -46,15 +46,28 @@ pub struct Checkbox {
 }
 
 #[derive(Debug)]
-#[repr(transparent)]
+#[repr(C)]
 pub struct Column {
     pub children: RocList<Element>,
+    pub height: Length,
+    pub max_width: f32,
+    pub padding: Padding,
+    pub spacing: f32,
+    pub width: Length,
+    pub align_items: Alignment,
+    pub clip: bool,
 }
 
 #[derive(Debug)]
-#[repr(transparent)]
+#[repr(C)]
 pub struct Row {
     pub children: RocList<Element>,
+    pub height: Length,
+    pub padding: Padding,
+    pub spacing: f32,
+    pub width: Length,
+    pub align_items: Alignment,
+    pub clip: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
@@ -497,6 +510,14 @@ pub struct WindowSettings {
 pub struct Init {
     pub model: RocBox<c_void>,
     pub settings: Settings,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[repr(u8)]
+pub enum Alignment {
+    Center,
+    End,
+    Start,
 }
 
 #[derive(Debug, Clone, Copy)]

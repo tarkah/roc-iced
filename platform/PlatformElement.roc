@@ -4,13 +4,15 @@ import Box exposing [box]
 
 import Action exposing [Action]
 import Element exposing [Element]
+import Element.Column exposing [Column]
 import Element.Container exposing [Container]
+import Element.Row exposing [Row]
 import Length exposing [Length]
 
 PlatformElement message : [
     Text Str,
-    Row (List (PlatformElement message)),
-    Column (List (PlatformElement message)),
+    Row (Row (PlatformElement message)),
+    Column (Column (PlatformElement message)),
     Container (Container (PlatformElement message)),
     Button { content : PlatformElement message, onPress : Action message },
     Checkbox { label : Str, isChecked : Bool, onToggle : Action (Box (Bool -> message)) },
@@ -24,11 +26,11 @@ boxed = \elem ->
             Text s ->
                 Text s
 
-            Row children ->
-                Row (List.map children map)
+            Row { children, spacing, padding, width, height, alignItems, clip } ->
+                Row { children: List.map children map, spacing, padding, width, height, alignItems, clip }
 
-            Column children ->
-                Column (List.map children map)
+            Column { children, spacing, padding, width, height, maxWidth, alignItems, clip } ->
+                Column { children: List.map children map, spacing, padding, width, height, maxWidth, alignItems, clip }
 
             Container { content, padding, width, height, maxWidth, maxHeight, horizontalAlignment, verticalAlignment, clip, style } ->
                 Container { content: map content, padding, width, height, maxWidth, maxHeight, horizontalAlignment, verticalAlignment, clip, style }

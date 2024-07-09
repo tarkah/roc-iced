@@ -3,6 +3,8 @@ app [program, Model, Message] {
 }
 
 import iced.Color
+import iced.Element.Column as Column
+import iced.Element.Column exposing [column]
 import iced.Element.Container as Container
 import iced.Element.Container exposing [container]
 import iced.Element exposing [Element]
@@ -37,34 +39,38 @@ update = \model, message ->
 
 view : Model -> Element Message
 view = \model ->
-    Column [
-        Text "Roc + Iced <3",
-        Button {
-            content: Text "Pressed $(Num.toStr model.count) times",
-            onPress: Active IncrementCount,
-        },
-        Checkbox {
-            label: "Foo",
-            isChecked: model.isFooChecked,
-            onToggle: Active FooToggled,
-        },
-        Checkbox {
-            label: "Bar",
-            isChecked: model.isBarChecked,
-            onToggle: Active BarToggled,
-        },
-        Checkbox {
-            label: "Baz",
-            isChecked: Bool.false,
-            onToggle: Disabled,
-        },
-        TextInput {
-            value: model.input,
-            width: Fixed 150,
-            onInput: Active Input,
-            onSubmit: Active Submitted,
-        },
-    ]
+    content =
+        column [
+            Text "Roc + Iced <3",
+            Button {
+                content: Text "Pressed $(Num.toStr model.count) times",
+                onPress: Active IncrementCount,
+            },
+            Checkbox {
+                label: "Foo",
+                isChecked: model.isFooChecked,
+                onToggle: Active FooToggled,
+            },
+            Checkbox {
+                label: "Bar",
+                isChecked: model.isBarChecked,
+                onToggle: Active BarToggled,
+            },
+            Checkbox {
+                label: "Baz",
+                isChecked: Bool.false,
+                onToggle: Disabled,
+            },
+            TextInput {
+                value: model.input,
+                width: Fixed 150,
+                onInput: Active Input,
+                onSubmit: Active Submitted,
+            },
+        ]
+        |> Column.spacing 4
+
+    content
     |> boxed
     |> centered
 

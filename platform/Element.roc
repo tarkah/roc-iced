@@ -2,13 +2,14 @@ module [Element, map]
 
 import Action exposing [Action]
 import Length exposing [Length]
-import Element.Container as Container
+import Element.Column exposing [Column]
 import Element.Container exposing [Container]
+import Element.Row exposing [Row]
 
 Element message : [
     Text Str,
-    Row (List (Element message)),
-    Column (List (Element message)),
+    Row (Row (Element message)),
+    Column (Column (Element message)),
     Container (Container (Element message)),
     Button { content : Element message, onPress : Action message },
     Checkbox { label : Str, isChecked : Bool, onToggle : Action (Bool -> message) },
@@ -23,11 +24,11 @@ map = \elem, mapper ->
         Text s ->
             Text s
 
-        Row children ->
-            Row (List.map children elemMapper)
+        Row { children, spacing, padding, width, height, alignItems, clip } ->
+            Row { children: List.map children elemMapper, spacing, padding, width, height, alignItems, clip }
 
-        Column children ->
-            Column (List.map children elemMapper)
+        Column { children, spacing, padding, width, height, maxWidth, alignItems, clip } ->
+            Column { children: List.map children elemMapper, spacing, padding, width, height, maxWidth, alignItems, clip }
 
         Container { content, padding, width, height, maxWidth, maxHeight, horizontalAlignment, verticalAlignment, clip, style } ->
             Container { content: elemMapper content, padding, width, height, maxWidth, maxHeight, horizontalAlignment, verticalAlignment, clip, style }

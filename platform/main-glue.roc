@@ -2,7 +2,7 @@ platform "glue-workaround"
     requires {} { notUsed : _ }
     exposes []
     packages {}
-    imports [Alignment, Length.{ Length }, Padding.{ Padding }, Option.{ Option }, Color.{ Color }, Border.{ Border }]
+    imports [Alignment.{ Alignment }, Length.{ Length }, Padding.{ Padding }]
     provides [mainForHost]
 
 # Element message : [
@@ -15,25 +15,21 @@ platform "glue-workaround"
 #     TextInput { value : Str, width : Length, onInput : Str -> message, onSubmit : message },
 # ]
 
-Container content : {
-    content : content,
+Column elem : {
+    children : List elem,
+    spacing : F32,
     padding : Padding,
-    width : Option Length,
-    height : Option Length,
+    width : Length,
+    height : Length,
     maxWidth : F32,
-    maxHeight : F32,
-    horizontalAlignment : Alignment.Horizontal,
-    verticalAlignment : Alignment.Vertical,
+    alignItems : Alignment,
     clip : Bool,
-    style : Style,
 }
-
-Style : { textColor : Color, background : Color, border : Border }
 
 # We are generating only glue for the types we need as a workaround until `roc glue`
 # is able to generate correctly for the platform
 GlueStuff : {
-    a : Container {},
+    a : Column {},
     # a : Alignment.Vertical,
     # b : Alignment.Horizontal,
     # c : Length,

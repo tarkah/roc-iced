@@ -29,7 +29,7 @@ impl App {
     }
 
     fn view<'a>(&'a self) -> Element<'a, Message> {
-        convert::element(&dbg!(self.program.view()))
+        convert::element(&self.program.view())
     }
 }
 
@@ -67,9 +67,15 @@ mod convert {
             glue::ElementTag::Column => {
                 let inner = roc_elem.column();
 
-                let children = &inner.children;
-
-                column(children.iter().map(element)).into()
+                column(inner.children.iter().map(element))
+                    .width(length(inner.width))
+                    .height(length(inner.height))
+                    .max_width(inner.max_width)
+                    .padding(padding(inner.padding))
+                    .spacing(inner.spacing)
+                    .align_items(alignment(inner.align_items))
+                    .clip(inner.clip)
+                    .into()
             }
             glue::ElementTag::Container => {
                 let inner = roc_elem.container();
@@ -104,7 +110,14 @@ mod convert {
             glue::ElementTag::Row => {
                 let inner = roc_elem.row();
 
-                row(inner.children.iter().map(element)).into()
+                row(inner.children.iter().map(element))
+                    .width(length(inner.width))
+                    .height(length(inner.height))
+                    .padding(padding(inner.padding))
+                    .spacing(inner.spacing)
+                    .align_items(alignment(inner.align_items))
+                    .clip(inner.clip)
+                    .into()
             }
             glue::ElementTag::Text => {
                 let inner = roc_elem.text();
@@ -171,6 +184,14 @@ mod convert {
             right,
             bottom,
             left,
+        }
+    }
+
+    fn alignment(a: glue::Alignment) -> iced::Alignment {
+        match a {
+            glue::Alignment::Start => iced::Alignment::Start,
+            glue::Alignment::Center => iced::Alignment::Center,
+            glue::Alignment::End => iced::Alignment::End,
         }
     }
 
