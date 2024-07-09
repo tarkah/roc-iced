@@ -3,6 +3,8 @@ app [program, Model, Message] {
 }
 
 import iced.Color
+import iced.Element.Button as Button
+import iced.Element.Button exposing [button]
 import iced.Element.Column as Column
 import iced.Element.Column exposing [column]
 import iced.Element.Container as Container
@@ -42,10 +44,7 @@ view = \model ->
     content =
         column [
             Text "Roc + Iced <3",
-            Button {
-                content: Text "Pressed $(Num.toStr model.count) times",
-                onPress: Active IncrementCount,
-            },
+            incrementButton model.count,
             Checkbox {
                 label: "Foo",
                 isChecked: model.isFooChecked,
@@ -74,10 +73,9 @@ view = \model ->
     |> boxed
     |> centered
 
-centered = \elem ->
-    elem
-    |> container
-    |> Container.center Fill
+incrementButton = \count ->
+    button (Text "Pressed $(Num.toStr count) times")
+    |> Button.onPress IncrementCount
 
 boxed = \elem ->
     background = Some (Color.fromHex 0xcad4e0ff)
@@ -88,3 +86,8 @@ boxed = \elem ->
     |> container
     |> Container.padding 8
     |> Container.style style
+
+centered = \elem ->
+    elem
+    |> container
+    |> Container.center Fill

@@ -2,6 +2,7 @@ module [Element, map]
 
 import Action exposing [Action]
 import Length exposing [Length]
+import Element.Button exposing [Button]
 import Element.Column exposing [Column]
 import Element.Container exposing [Container]
 import Element.Row exposing [Row]
@@ -11,7 +12,7 @@ Element message : [
     Row (Row (Element message)),
     Column (Column (Element message)),
     Container (Container (Element message)),
-    Button { content : Element message, onPress : Action message },
+    Button (Button (Element message) message),
     Checkbox { label : Str, isChecked : Bool, onToggle : Action (Bool -> message) },
     TextInput { value : Str, width : Length, onInput : Action (Str -> message), onSubmit : Action message },
 ]
@@ -33,8 +34,8 @@ map = \elem, mapper ->
         Container { content, padding, width, height, maxWidth, maxHeight, horizontalAlignment, verticalAlignment, clip, style } ->
             Container { content: elemMapper content, padding, width, height, maxWidth, maxHeight, horizontalAlignment, verticalAlignment, clip, style }
 
-        Button { content, onPress } ->
-            Button { content: elemMapper content, onPress: Action.map onPress \a -> mapper a }
+        Button { content, onPress, width, height, padding, clip, style } ->
+            Button { content: elemMapper content, onPress: Action.map onPress \a -> mapper a, width, height, padding, clip, style }
 
         Checkbox { label, isChecked, onToggle } ->
             Checkbox {

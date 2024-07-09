@@ -9,6 +9,54 @@ use roc_std::{RocBox, RocList, RocStr};
 pub struct Button {
     pub content: Element,
     pub on_press: Action<RocBox<c_void>>,
+    pub style: ButtonStyleFn,
+    pub height: Optional<Length>,
+    pub padding: Padding,
+    pub width: Optional<Length>,
+    pub clip: bool,
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct ButtonStyle {
+    pub background: Optional<Color>,
+    pub border: Border,
+    pub text_color: Color,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[repr(u8)]
+pub enum ButtonStatus {
+    Active,
+    Disabled,
+    Hovered,
+    Pressed,
+}
+
+#[derive(Debug, Clone)]
+#[repr(transparent)]
+pub struct ButtonStyleFn {
+    closure_data: RocBox<c_void>,
+}
+
+impl ButtonStyleFn {
+    pub fn force_thunk(&self, arg0: ButtonStatus) -> Optional<ButtonStyle> {
+        extern "C" {
+            fn roc__mainForHost_4_caller(
+                arg0: *const ButtonStatus,
+                closure_data: *const c_void,
+                output: *mut Optional<ButtonStyle>,
+            );
+        }
+
+        let mut output = core::mem::MaybeUninit::uninit();
+
+        unsafe {
+            roc__mainForHost_4_caller(&arg0, &*self.closure_data, output.as_mut_ptr());
+
+            output.assume_init()
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -458,6 +506,13 @@ impl<T> Optional<T> {
         match self.tag {
             OptionalTag::None => None,
             OptionalTag::Some => unsafe { Some(&*self.payload.some) },
+        }
+    }
+
+    pub fn into_option(mut self) -> Option<T> {
+        match self.tag {
+            OptionalTag::None => None,
+            OptionalTag::Some => unsafe { Some(ManuallyDrop::take(&mut self.payload.some)) },
         }
     }
 }

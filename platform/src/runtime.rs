@@ -44,10 +44,29 @@ mod convert {
             glue::ElementTag::Button => {
                 let inner = roc_elem.button();
 
-                let mut button = button(element(&inner.content));
+                let style_fn = inner.style.clone();
+
+                let mut button = button(element(&inner.content))
+                    .padding(padding(inner.padding))
+                    .clip(inner.clip)
+                    .style(move |theme, status| {
+                        style_fn
+                            .force_thunk(button_status(status))
+                            .into_option()
+                            .map(button_style)
+                            .unwrap_or_else(|| button::primary(theme, status))
+                    });
 
                 if let Some(action) = inner.on_press.active().cloned() {
                     button = button.on_press(Message(action));
+                }
+
+                if let Some(width) = inner.width.as_option().copied().map(length) {
+                    button = button.width(width);
+                }
+
+                if let Some(height) = inner.height.as_option().copied().map(length) {
+                    button = button.height(height);
                 }
 
                 button.into()
@@ -208,6 +227,24 @@ mod convert {
             glue::VerticalAlignment::Bottom => iced::alignment::Vertical::Bottom,
             glue::VerticalAlignment::Center => iced::alignment::Vertical::Center,
             glue::VerticalAlignment::Top => iced::alignment::Vertical::Top,
+        }
+    }
+
+    fn button_status(s: iced::widget::button::Status) -> glue::ButtonStatus {
+        match s {
+            iced::widget::button::Status::Active => glue::ButtonStatus::Active,
+            iced::widget::button::Status::Disabled => glue::ButtonStatus::Disabled,
+            iced::widget::button::Status::Hovered => glue::ButtonStatus::Hovered,
+            iced::widget::button::Status::Pressed => glue::ButtonStatus::Pressed,
+        }
+    }
+
+    fn button_style(s: glue::ButtonStyle) -> button::Style {
+        button::Style {
+            background: s.background.as_option().copied().map(color).map(From::from),
+            text_color: color(s.text_color),
+            border: border(s.border),
+            shadow: iced::Shadow::default(),
         }
     }
 

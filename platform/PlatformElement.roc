@@ -4,6 +4,7 @@ import Box exposing [box]
 
 import Action exposing [Action]
 import Element exposing [Element]
+import Element.Button exposing [Button]
 import Element.Column exposing [Column]
 import Element.Container exposing [Container]
 import Element.Row exposing [Row]
@@ -14,7 +15,7 @@ PlatformElement message : [
     Row (Row (PlatformElement message)),
     Column (Column (PlatformElement message)),
     Container (Container (PlatformElement message)),
-    Button { content : PlatformElement message, onPress : Action message },
+    Button (Button (PlatformElement message) message),
     Checkbox { label : Str, isChecked : Bool, onToggle : Action (Box (Bool -> message)) },
     TextInput { value : Str, width : Length, onInput : Action (Box (Str -> message)), onSubmit : Action message },
 ]
@@ -35,8 +36,8 @@ boxed = \elem ->
             Container { content, padding, width, height, maxWidth, maxHeight, horizontalAlignment, verticalAlignment, clip, style } ->
                 Container { content: map content, padding, width, height, maxWidth, maxHeight, horizontalAlignment, verticalAlignment, clip, style }
 
-            Button { content, onPress } ->
-                Button { content: map content, onPress }
+            Button { content, onPress, width, height, padding, clip, style } ->
+                Button { content: map content, onPress, width, height, padding, clip, style }
 
             Checkbox { label, isChecked, onToggle } ->
                 Checkbox {
