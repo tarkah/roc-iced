@@ -42,7 +42,7 @@ pub struct ButtonStyleFn {
 impl ButtonStyleFn {
     pub fn force_thunk(&self, arg0: ButtonStatus) -> Optional<ButtonStyle> {
         extern "C" {
-            fn roc__mainForHost_4_caller(
+            fn roc__mainForHost_5_caller(
                 arg0: *const ButtonStatus,
                 closure_data: *const c_void,
                 output: *mut Optional<ButtonStyle>,
@@ -52,7 +52,7 @@ impl ButtonStyleFn {
         let mut output = core::mem::MaybeUninit::uninit();
 
         unsafe {
-            roc__mainForHost_4_caller(&arg0, &*self.closure_data, output.as_mut_ptr());
+            roc__mainForHost_5_caller(&arg0, &*self.closure_data, output.as_mut_ptr());
 
             output.assume_init()
         }
@@ -68,7 +68,7 @@ pub struct CheckboxOnToggle {
 impl CheckboxOnToggle {
     pub fn force_thunk(&self, arg0: bool) -> RocBox<c_void> {
         extern "C" {
-            fn roc__mainForHost_3_caller(
+            fn roc__mainForHost_4_caller(
                 arg0: *const bool,
                 closure_data: *const c_void,
                 output: *mut RocBox<c_void>,
@@ -78,7 +78,7 @@ impl CheckboxOnToggle {
         let mut output = core::mem::MaybeUninit::uninit();
 
         unsafe {
-            roc__mainForHost_3_caller(&arg0, &*self.closure_data, output.as_mut_ptr());
+            roc__mainForHost_4_caller(&arg0, &*self.closure_data, output.as_mut_ptr());
 
             output.assume_init()
         }
@@ -220,7 +220,7 @@ pub struct TextInputOnInput {
 impl TextInputOnInput {
     pub fn force_thunk(&self, arg0: &str) -> RocBox<c_void> {
         extern "C" {
-            fn roc__mainForHost_2_caller(
+            fn roc__mainForHost_3_caller(
                 arg0: *const RocStr,
                 closure_data: *const c_void,
                 output: *mut RocBox<c_void>,
@@ -233,7 +233,7 @@ impl TextInputOnInput {
         let arg = ManuallyDrop::new(RocStr::from(arg0));
 
         unsafe {
-            roc__mainForHost_2_caller(&*arg, &*self.closure_data, output.as_mut_ptr());
+            roc__mainForHost_3_caller(&*arg, &*self.closure_data, output.as_mut_ptr());
 
             output.assume_init()
         }

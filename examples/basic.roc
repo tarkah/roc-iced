@@ -10,7 +10,9 @@ import iced.Element.Column exposing [column]
 import iced.Element.Container as Container
 import iced.Element.Container exposing [container]
 import iced.Element exposing [Element]
+import iced.Io
 import iced.Settings exposing [Settings]
+import iced.Task exposing [Task]
 
 program = { init, update, view }
 
@@ -30,14 +32,19 @@ init = {
     settings: Settings.default |> Settings.size { width: 300, height: 300 },
 }
 
-update : Model, Message -> Model
+update : Model, Message -> Task Model {}
 update = \model, message ->
-    when message is
-        IncrementCount -> { model & count: model.count + 1 }
-        FooToggled isFooChecked -> { model & isFooChecked }
-        BarToggled isBarChecked -> { model & isBarChecked }
-        Input input -> { model & input }
-        Submitted -> { model & input: "" }
+    _ <- Io.println "update: $(Inspect.toStr message)" |> Task.await
+
+    updatedModel =
+        when message is
+            IncrementCount -> { model & count: model.count + 1 }
+            FooToggled isFooChecked -> { model & isFooChecked }
+            BarToggled isBarChecked -> { model & isBarChecked }
+            Input input -> { model & input }
+            Submitted -> { model & input: "" }
+
+    Task.ok updatedModel
 
 view : Model -> Element Message
 view = \model ->

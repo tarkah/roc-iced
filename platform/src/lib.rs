@@ -1,4 +1,4 @@
-use roc_std::{RocBox, RocStr};
+use roc_std::{RocBox, RocResult, RocStr};
 use std::{
     ffi::c_void,
     mem::{self, ManuallyDrop},
@@ -50,9 +50,18 @@ impl Program {
                 model: *const Model,
                 message: *const Message,
                 closure_data: *mut u8,
-                output: *mut Model,
+                output: *mut u8,
+            );
+            fn roc__mainForHost_0_result_size() -> usize;
+            fn roc__mainForHost_1_caller(
+                arg: *const u8,
+                closure_data: *const u8,
+                output: *mut RocResult<Model, ()>,
             );
         }
+
+        let closure_size = unsafe { roc__mainForHost_0_result_size() };
+        let mut closure_data = vec![0; closure_size];
 
         let mut output = core::mem::MaybeUninit::uninit();
 
@@ -61,19 +70,24 @@ impl Program {
                 &*self.model,
                 &message,
                 vec![].as_mut_ptr(),
-                output.as_mut_ptr(),
+                closure_data.as_mut_ptr(),
             );
+            roc__mainForHost_1_caller(vec![].as_ptr(), closure_data.as_ptr(), output.as_mut_ptr());
 
             // Decremented by Roc
             mem::forget(message);
 
-            self.model = ManuallyDrop::new(output.assume_init());
+            let result: Result<_, _> = output.assume_init().into();
+
+            if let Ok(model) = result {
+                self.model = ManuallyDrop::new(model);
+            }
         }
     }
 
     pub fn view(&self) -> glue::Element {
         extern "C" {
-            fn roc__mainForHost_1_caller(
+            fn roc__mainForHost_2_caller(
                 model: *const Model,
                 closure_data: *mut u8,
                 output: *mut glue::Element,
@@ -86,11 +100,16 @@ impl Program {
         let model = self.model.clone();
 
         unsafe {
-            roc__mainForHost_1_caller(&*model, vec![].as_mut_ptr(), output.as_mut_ptr());
+            roc__mainForHost_2_caller(&*model, vec![].as_mut_ptr(), output.as_mut_ptr());
 
             return output.assume_init();
         }
     }
+}
+
+#[no_mangle]
+pub extern "C" fn roc_fx_println(s: &RocStr) {
+    println!("{s}");
 }
 
 #[no_mangle]
